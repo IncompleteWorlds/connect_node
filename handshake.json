@@ -1,0 +1,51 @@
+{
+    "node_data": {
+        "network_id": "1230f171-6104-4161-1731-008216a1a111",
+        "my_port": 28080,
+        "rpc_port": 0,
+        "rpc_credits_per_hash": 0,
+        "peer_id": 2271560481,
+        "support_flags": 1
+    },
+    "payload_data": {
+        "current_height": 0,
+        "cumulative_difficulty": 0,
+        "cumulative_difficulty_top64": 0,
+        "top_id": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "top_version": 0,
+        "pruning_seed": 0
+    }
+}

@@ -1,0 +1,7 @@
+target/
+Cargo.lock
+monerod-output.txt
+node_log.txt
+.vscode/*
+output-monero.txt
+
