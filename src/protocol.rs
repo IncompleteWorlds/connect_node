@@ -81,8 +81,6 @@ impl P2PMessage {
     }
 
     pub fn to_bytes(&self) -> Vec<u8> {
-        // println!("P2P Messgae to_bytes: {}", self.buffer.len());
-
         let mut output_buffer = BytesMut::with_capacity(HEADER_SIZE as usize + self.buffer.len());
 
         output_buffer.extend_from_slice(&self.header.to_bytes());
@@ -333,6 +331,8 @@ fn p2p_handshake() {
     assert_eq!(encoded_bytes, request_bytes);
 }
 
+// NOTE: This test case causes a stack overflow in the epee_encoding library
+//
 #[test]
 fn p2p_handshake_res() {
     let bytes = [

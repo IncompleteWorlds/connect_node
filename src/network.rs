@@ -3,14 +3,11 @@ use std::{
     net::{self, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6, ToSocketAddrs},
 };
 
-// use bytes::{Buf, BufMut, Bytes};
 use epee_encoding::{
     io::{Read, Write},
     read_epee_value, write_field, EpeeObject, EpeeObjectBuilder,
 };
 use serde::{Deserialize, Serialize};
-
-// use crate::error::MyError;
 
 #[derive(Debug, Copy, Clone, Serialize, Deserialize, PartialEq)]
 pub enum NetworkAddressTypeEnum {
@@ -79,17 +76,17 @@ impl EpeeObjectBuilder<NetworkAddress> for __NetworkAddress {
             }
             _ => return Ok(false),
         }
-        println!(" Add NetAddr. addr = {:x?}", self.addr);
+        println!("DEBUG: Add NetAddr. addr = {:x?}", self.addr);
         Ok(true)
     }
 
     fn finish(self) -> epee_encoding::error::Result<NetworkAddress> {
-        println!(" Finishing NetAdd. addr = {:x?}", self.addr);
+        println!("DEBUG: Finishing NetAdd. addr = {:x?}", self.addr);
 
         Ok(NetworkAddress {
             addr_type: self.addr_type,
             addr: self.addr.ok_or_else(|| {
-                println!(" Finishing NetAdd. addr = {:x?}", self.addr);
+                println!("DEBUG: Finishing NetAdd. addr = {:x?}", self.addr);
                 epee_encoding::error::Error::Format("Required field was not found!")
             })?,
             port: self.port.unwrap().clone(),
@@ -106,8 +103,7 @@ impl EpeeObject for NetworkAddress {
 
     fn write_fields<W: Write>(&self, w: &mut W) -> epee_encoding::error::Result<()> {
         // write the fields
-        //write_field(&self.val, "val", w)
-        println!(" TaggedNetworkAddress::from(self).write_fields(w) ");
+        println!("DEBUG: TaggedNetworkAddress::from(self).write_fields(w) ");
         TaggedNetworkAddress::from(self).write_fields(w)
     }
 }
@@ -128,24 +124,18 @@ impl NetworkAddress {
     }
 
     pub fn port(&self) -> u16 {
-        // match self {
-        //     NetworkAddress::Clear(ip) => ip.port(),
-        // }
         self.port()
     }
 }
 
 impl From<net::SocketAddrV4> for NetworkAddress {
     fn from(value: net::SocketAddrV4) -> Self {
-        //NetworkAddress::Clear(value.into())
-        // value.into()
-
         let mut tmp_buffer: [u8; 16] = [0; 16];
         for i in 0..4 {
             tmp_buffer[i] = value.ip().octets()[i];
         }
 
-        println!(" IPv4 value: {:?} ", value);
+        println!("DEBUG: IPv4 value: {:?} ", value);
 
         NetworkAddress {
             addr_type: NetworkAddressTypeEnum::IPV4,
@@ -157,15 +147,12 @@ impl From<net::SocketAddrV4> for NetworkAddress {
 
 impl From<net::SocketAddrV6> for NetworkAddress {
     fn from(value: net::SocketAddrV6) -> Self {
-        //NetworkAddress::Clear(value.into())
-        // value.into()
-
         let mut tmp_buffer: [u8; 16] = [0; 16];
         for i in 0..16 {
             tmp_buffer[i] = value.ip().octets()[i];
         }
 
-        println!(" IPv6 value: {:?} ", value);
+        println!("DEBUG: IPv6 value: {:?} ", value);
 
         NetworkAddress {
             addr_type: NetworkAddressTypeEnum::IPV6,
@@ -203,7 +190,10 @@ impl EpeeObjectBuilder<NetworkAddress> for TaggedNetworkAddress {
         name: &str,
         b: &mut B,
     ) -> Result<bool, epee_encoding::Error> {
-        println!(" EpeeObjectBuilder<NetworkAddress> : name {:?} ", name);
+        println!(
+            "DEBUG: EpeeObjectBuilder<NetworkAddress> : name {:?} ",
+            name
+        );
 
         match name {
             "type" => {
@@ -229,7 +219,7 @@ impl EpeeObjectBuilder<NetworkAddress> for TaggedNetworkAddress {
     }
 
     fn finish(self) -> Result<NetworkAddress, epee_encoding::Error> {
-        println!(" EpeeObjectBuilder<NetworkAddress> : finish");
+        println!("DEBUG: EpeeObjectBuilder<NetworkAddress> : finish");
         self.try_into()
             .map_err(|_| epee_encoding::Error::Value("Invalid network address"))
     }
@@ -242,7 +232,7 @@ impl EpeeObjectBuilder<TaggedNetworkAddress> for __TaggedNetworkAddress {
         b: &mut Buf,
     ) -> Result<bool, epee_encoding::Error> {
         println!(
-            " EpeeObjectBuilder<TaggedNetworkAddress> : name {:?} ",
+            "DEBUG: EpeeObjectBuilder<TaggedNetworkAddress> : name {:?} ",
             name
         );
 
@@ -266,7 +256,7 @@ impl EpeeObjectBuilder<TaggedNetworkAddress> for __TaggedNetworkAddress {
     }
 
     fn finish(self) -> Result<TaggedNetworkAddress, epee_encoding::Error> {
-        println!(" EpeeObjectBuilder<TaggedNetworkAddress> finish ");
+        println!("DEBUG: EpeeObjectBuilder<TaggedNetworkAddress> finish ");
 
         self.try_into()
             .map_err(|_| epee_encoding::Error::Value("Invalid network address"))
@@ -282,7 +272,7 @@ impl EpeeObject for TaggedNetworkAddress {
 
     fn write_fields<W: Write>(&self, w: &mut W) -> epee_encoding::error::Result<()> {
         // write the fields
-        println!(" EpeeObject for TaggedNetworkAddress  write_fields ");
+        println!("DEBUG: EpeeObject for TaggedNetworkAddress  write_fields ");
 
         write_field(&self.ty, "type", w)?;
         write_field(&self.addr, "addr", w)
@@ -291,7 +281,10 @@ impl EpeeObject for TaggedNetworkAddress {
 
 impl TryFrom<__TaggedNetworkAddress> for TaggedNetworkAddress {
     fn try_from(value: __TaggedNetworkAddress) -> Result<Self, Self::Error> {
-        println!(" TryFrom<__TaggedNetworkAddress>  value: {:?} ", value);
+        println!(
+            "DEBUG: TryFrom<__TaggedNetworkAddress>  value: {:?} ",
+            value
+        );
 
         Ok(TaggedNetworkAddress {
             ty: value.ty.clone(),
@@ -306,7 +299,7 @@ impl TryFrom<TaggedNetworkAddress> for NetworkAddress {
 
     fn try_from(value: TaggedNetworkAddress) -> Result<Self, Self::Error> {
         println!(
-            " TryFrom<TaggedNetworkAddress>   try_from. value: {:?} ",
+            "DEBUG: TryFrom<TaggedNetworkAddress>   try_from. value: {:?} ",
             value
         );
 
@@ -327,7 +320,7 @@ impl TryFrom<__TaggedNetworkAddress> for NetworkAddress {
 
     fn try_from(value: __TaggedNetworkAddress) -> Result<Self, Self::Error> {
         println!(
-            " TryFrom<__TaggedNetworkAddress>  try_from. value: {:?} ",
+            "DEBUG: TryFrom<__TaggedNetworkAddress>  try_from. value: {:?} ",
             value
         );
 
@@ -344,7 +337,7 @@ impl TryFrom<__TaggedNetworkAddress> for NetworkAddress {
 }
 impl From<&NetworkAddress> for TaggedNetworkAddress {
     fn from(value: &NetworkAddress) -> Self {
-        println!(" From<&NetworkAddress> from. value: {:?} ", value);
+        println!("DEBUG: From<&NetworkAddress> from. value: {:?} ", value);
 
         let mut tmp_ipv4: [u8; 4] = [0; 4];
         for i in 0..4 {
@@ -378,7 +371,7 @@ impl From<&NetworkAddress> for TaggedNetworkAddress {
 
 impl From<NetworkAddress> for __TaggedNetworkAddress {
     fn from(value: NetworkAddress) -> Self {
-        println!(" From<NetworkAddress> from. value: {:?} ", value);
+        println!("DEBUG: From<NetworkAddress> from. value: {:?} ", value);
 
         let mut tmp_ipv4: [u8; 4] = [0; 4];
         for i in 0..4 {
@@ -421,7 +414,7 @@ pub struct AllFieldsNetworkAddress {
 impl AllFieldsNetworkAddress {
     fn try_into_network_address(self, ty: u8) -> Option<NetworkAddress> {
         println!(
-            "  AllFieldsNetworkAddress  try_into_network_address: {:?} ",
+            "DEBUG:  AllFieldsNetworkAddress  try_into_network_address: {:?} ",
             ty
         );
 
@@ -437,188 +430,3 @@ impl AllFieldsNetworkAddress {
         })
     }
 }
-
-/*
-
-// #[derive(MyError, Debug)]
-// #[error("Invalid network address")]
-pub struct InvalidNetworkAddress;
-
-impl TryFrom<TaggedNetworkAddress> for NetworkAddress {
-    type Error = InvalidNetworkAddress;
-
-    fn try_from(value: TaggedNetworkAddress) -> Result<Self, Self::Error> {
-        value
-            .addr
-            .ok_or(InvalidNetworkAddress)?
-            .try_into_network_address(value.ty.ok_or(InvalidNetworkAddress)?)
-            .ok_or(InvalidNetworkAddress)
-    }
-}
-
-// #[derive(Debug, PartialEq, Serialize, Deserialize, EpeeObject)]
-// pub struct IPv4NetworkAddress {
-//     pub addr: u32,
-
-//     pub m_ip: u32,
-//     pub m_port: u16,
-// }
-
-#[derive(Default, EpeeObject)]
-pub struct TaggedNetworkAddress {
-    ty: Option<u8>,
-    addr: Option<AllFieldsNetworkAddress>,
-}
-
-// epee_object!(
-//     TaggedNetworkAddress,
-//     ty("type"): Option<u8>,
-//     addr: Option<AllFieldsNetworkAddress>,
-// );
-
-impl EpeeObjectBuilder<NetworkAddress> for TaggedNetworkAddress {
-    fn add_field<B: Buf + epee_encoding::io::Read>(
-        &mut self,
-        name: &str,
-        b: &mut B,
-    ) -> Result<bool, epee_encoding::Error> {
-        match name {
-            "type" => {
-                if std::mem::replace(&mut self.ty, Some(epee_encoding::read_epee_value(b)?))
-                    .is_some()
-                {
-                    return Err(epee_encoding::Error::Format("Duplicate field in data."));
-                }
-                Ok(true)
-            }
-            "addr" => {
-                if std::mem::replace(&mut self.addr, epee_encoding::read_epee_value(b)?).is_some() {
-                    return Err(epee_encoding::Error::Format("Duplicate field in data."));
-                }
-                Ok(true)
-            }
-            _ => Ok(false),
-        }
-    }
-
-    fn finish(self) -> Result<NetworkAddress, epee_encoding::Error> {
-        self.try_into()
-            .map_err(|_| epee_encoding::Error::Value("Invalid network address"))
-    }
-}
-
-impl From<NetworkAddress> for TaggedNetworkAddress {
-    fn from(value: NetworkAddress) -> Self {
-        match value {
-            NetworkAddress::Clear(addr) => match addr {
-                SocketAddr::V4(addr) => TaggedNetworkAddress {
-                    ty: Some(1),
-                    addr: Some(AllFieldsNetworkAddress {
-                        m_ip: Some(u32::from_be_bytes(addr.ip().octets())),
-                        m_port: Some(addr.port()),
-                        addr: None,
-                    }),
-                },
-                SocketAddr::V6(addr) => TaggedNetworkAddress {
-                    ty: Some(2),
-                    addr: Some(AllFieldsNetworkAddress {
-                        addr: Some(addr.ip().octets()),
-                        m_port: Some(addr.port()),
-                        m_ip: None,
-                    }),
-                },
-            },
-        }
-    }
-}
-
-#[derive(Debug, PartialEq, Serialize, Deserialize, EpeeObject)]
-struct AllFieldsNetworkAddress {
-    pub m_ip: Option<u32>,
-    pub m_port: Option<u16>,
-    pub addr: Option<[u8; 16]>,
-}
-
-impl AllFieldsNetworkAddress {
-    fn try_into_network_address(self, ty: u8) -> Option<NetworkAddress> {
-        Some(match ty {
-            1 => NetworkAddress::from(SocketAddrV4::new(Ipv4Addr::from(self.m_ip?), self.m_port?)),
-            2 => NetworkAddress::from(SocketAddrV6::new(
-                Ipv6Addr::from(self.addr?),
-                self.m_port?,
-                0,
-                0,
-            )),
-            _ => return None,
-        })
-    }
-}
-
-pub enum NetZone {
-    Public,
-    Tor,
-    I2p,
-}
-
-#[derive(Debug, PartialEq)]
-pub enum NetworkAddress {
-    Clear(SocketAddr),
-}
-
-impl EpeeObject for NetworkAddress {
-    type Builder = TaggedNetworkAddress;
-
-    fn number_of_fields(&self) -> u64 {
-        2
-    }
-
-    fn write_fields<B: BufMut>(&self, w: &mut B) -> Result<(), epee_encoding::Error> {
-        TaggedNetworkAddress::from(&self).write_fields(w)
-    }
-}
-
-impl NetworkAddress {
-    pub fn get_zone(&self) -> NetZone {
-        match self {
-            NetworkAddress::Clear(_) => NetZone::Public,
-        }
-    }
-
-    pub fn is_loopback(&self) -> bool {
-        // TODO
-        false
-    }
-
-    pub fn is_local(&self) -> bool {
-        // TODO
-        false
-    }
-
-    pub fn port(&self) -> u16 {
-        match self {
-            NetworkAddress::Clear(ip) => ip.port(),
-        }
-    }
-}
-
-impl From<net::SocketAddrV4> for NetworkAddress {
-    fn from(value: net::SocketAddrV4) -> Self {
-        NetworkAddress::Clear(value.into())
-    }
-}
-
-impl From<net::SocketAddrV6> for NetworkAddress {
-    fn from(value: net::SocketAddrV6) -> Self {
-        NetworkAddress::Clear(value.into())
-    }
-}
-
-impl From<SocketAddr> for NetworkAddress {
-    fn from(value: SocketAddr) -> Self {
-        match value {
-            SocketAddr::V4(v4) => v4.into(),
-            SocketAddr::V6(v6) => v6.into(),
-        }
-    }
-}
-*/
