@@ -5,7 +5,11 @@
  *               the handshake. After that, it dumps all received
  *               messages to a log file
  *
- * List of Test
+ *  NOTE: It does not work because the Monero P2P uses Boosts for
+ * serializing the messages and it is mainly undocumented.
+ * The crate I have used 'epee_encoding' does not work with long
+ * messages.
+ *
  */
 use std::{
     fs::File,

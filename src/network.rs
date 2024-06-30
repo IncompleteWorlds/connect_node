@@ -1,6 +1,5 @@
 use std::{
     fmt::Debug,
-    // io::Read,
     net::{self, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6, ToSocketAddrs},
 };
 
@@ -63,7 +62,6 @@ pub struct NetworkAddress {
     pub addr_type: NetworkAddressTypeEnum,
     pub addr: [u8; 16],
     pub port: u16,
-    // val: u64,
 }
 
 #[derive(Default, Debug)]
@@ -71,7 +69,6 @@ pub struct __NetworkAddress {
     pub addr_type: NetworkAddressTypeEnum,
     pub addr: Option<[u8; 16]>,
     pub port: Option<u16>,
-    // addr: Option<SocketAddr>,
 }
 
 impl EpeeObjectBuilder<NetworkAddress> for __NetworkAddress {
