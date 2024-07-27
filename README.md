@@ -1,6 +1,6 @@
 ## P2P Node Handshaking
 
-Alberto Fernandez (ajfg70@wanadoo.fr)
+Alberto Fernandez
 
 # Tasks
 - Pick a publicly available P2P node (e.g. a blockchain one) implementation -
